@@ -173,7 +173,7 @@ class App(Funcs):
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
 
 
-    def lista_frame2(self):
+    def lista_frame2(self): #frame 2
         
         self.lista = ttk.Treeview(self.frame_2, height=3, columns=('col1','col2','col3','col4','col5')) #função que cria a treeview
         self.lista.heading('#0', text='') #função que cria o heading da coluna;"# " codigo da coluna; define o texto do heading
