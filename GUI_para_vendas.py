@@ -83,6 +83,15 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.limpa_produto()
         self.select_lista()
 
+    def altera_produto(self):
+        self.variaveis()
+        self.connect_db()
+        self.cursor.execute(""" UPDATE produtos SET nome_produto = ?, preco = ?, laboratorio = ?, modo_pagamento = ? WHERE ID = ?""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento, self.id))
+        self.connect.commit()
+        self.disconnect_db()
+        self.select_lista()
+        self.limpa_produto()
+
 
 class App(Funcs):
     def __init__(self):
@@ -135,7 +144,7 @@ class App(Funcs):
         self.botao_buscar = Button(self.frame_1, text='Buscar') 
         self.botao_buscar.place(relx= 0.31, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_alterar = Button(self.frame_1, text='Alterar') 
+        self.botao_alterar = Button(self.frame_1, text='Alterar', command=self.altera_produto) 
         self.botao_alterar.place(relx= 0.42, rely= 0.9, relwidth=0.1, relheight=0.15)
 
         self.botao_inserir = Button(self.frame_1, text='Inserir', command=self.add_prod) 
@@ -192,7 +201,7 @@ class App(Funcs):
 
         self.lista.place(relx= 0.01, rely= 0.1, relwidth=0.95, relheight=0.85) #função que define a posição da tabela
 
-        self.scrolllista = Scrollbar(self.frame_2,orient='vertical') #função que cria uma scrollbar; define o sentido da scrollbar
+        self.scrolllista = Scrollbar(self.frame_2,orient='vertical',command=self.lista.yview) #função que cria uma scrollbar; define o sentido da scrollbar
         self.lista.configure(yscroll=self.scrolllista.set) #função que faz a fusão da tabela com a scrollbar
         self.scrolllista.place(relx=0.96,rely=0.1,relwidth=0.03,relheight=0.85) #função que define a posição da scrollbar
         
