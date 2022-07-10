@@ -116,7 +116,7 @@ class App(Funcs):
 
         self.root.title("Cadastro") #define o titulo da janela
 
-        self.root.configure(background='grey')   #define a cor do background da janela; pode ser uma imagem png tbm
+        self.root.configure(background='grey29')   #define a cor do background da janela; pode ser uma imagem png tbm
 
         self.root.geometry("780x500") #metodo que define o tamanho padrão da janela
 
@@ -129,41 +129,41 @@ class App(Funcs):
 
     def frames_da_tela(self): #metodo que cria e configura os frames
         
-        self.frame_1 = Frame(self.root, bd= 10, highlightbackground='black',highlightthickness=3) #Frame: cria o frame;bd=: borda; bg=: cor de fundo do frame; highlightbackground= cor da borda em volta do frame; highlightthickness= tamanho da borda em volta do frame
+        self.frame_1 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3, bg= 'grey38') #Frame: cria o frame;bd=: borda; bg=: cor de fundo do frame; highlightbackground= cor da borda em volta do frame; highlightthickness= tamanho da borda em volta do frame
         self.frame_1.place(relx= 0.02, rely= 0.02, relwidth= 0.96, relheight= 0.46)  #função que defina a posição onde o objeto ficara posicionado na janela; baseado nos parametros relx, rely, relwidth e relheight que vão de 0 a 1
 
-        self.frame_2 = Frame(self.root, bd= 10, highlightbackground='black',highlightthickness=3)
+        self.frame_2 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3,bg='grey38')
         self.frame_2.place(relx= 0.02, rely= 0.5, relwidth= 0.96, relheight= 0.46)
 
 
     def widgets_frame1(self): #função para criar botões 
         
-        self.botao_limpar = Button(self.frame_1, text='Limpar',command=self.limpa_produto) #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
+        self.botao_limpar = Button(self.frame_1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
         self.botao_limpar.place(relx= 0.2, rely= 0.9, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
-        self.botao_buscar = Button(self.frame_1, text='Buscar') 
+        self.botao_buscar = Button(self.frame_1, text='Buscar', bg='grey29',highlightbackground='grey21') 
         self.botao_buscar.place(relx= 0.31, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_alterar = Button(self.frame_1, text='Alterar', command=self.altera_produto) 
+        self.botao_alterar = Button(self.frame_1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_alterar.place(relx= 0.42, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_inserir = Button(self.frame_1, text='Inserir', command=self.add_prod) 
+        self.botao_inserir = Button(self.frame_1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_apagar = Button(self.frame_1, text='Apagar',command=self.deleta_produto) 
+        self.botao_apagar = Button(self.frame_1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.9, relwidth=0.1, relheight=0.15)
 
         #LABELS
-        self.lb_nome = Label(self.frame_1,text="Nome:") #Função que cria uma Label 
+        self.lb_nome = Label(self.frame_1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
         self.lb_nome.place(relx= 0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
 
-        self.lb_preco = Label(self.frame_1,text="Preço:") #Função que cria uma Label 
+        self.lb_preco = Label(self.frame_1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
         self.lb_preco.place(relx= 0.75, rely= 0.1, relwidth=0.1, relheight=0.15)
 
-        self.lb_lab = Label(self.frame_1,text="Laboratorio:") #Função que cria uma Label 
+        self.lb_lab = Label(self.frame_1,text="Laboratorio:", bg= 'grey38') #Função que cria uma Label 
         self.lb_lab.place(relx= 0.55, rely= 0.4, relwidth=0.16, relheight=0.15)
 
-        self.lb_modo = Label(self.frame_1,text="Modo de Pagamento:") #Função que cria uma Label 
+        self.lb_modo = Label(self.frame_1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
         self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
         self.id_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
