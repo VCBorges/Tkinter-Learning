@@ -109,8 +109,9 @@ class App(Funcs):
 
         self.select_lista() #metodo para adicionar iten no treeview
 
-        root.mainloop() #mantem a janela aberta
+        self.Menus()
 
+        root.mainloop() #mantem a janela aberta
 
     def tela(self): #metodo que configura a aparencia da janela
 
@@ -166,19 +167,19 @@ class App(Funcs):
         self.lb_modo = Label(self.frame_1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
         self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
-        self.id_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
+        self.id_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
 
-        self.nome_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
+        self.nome_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.nome_entry.place(relx= 0.09, rely= 0.1, relwidth=0.65, relheight=0.15) #relwidth: tamanho da barra de entrada
 
-        self.preco_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
+        self.preco_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.15)
 
-        self.modo_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
+        self.modo_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.15)
 
-        self.lab_entry = Entry(self.frame_1)  #Função que cria um entrada de texto
+        self.lab_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
 
 
@@ -206,5 +207,21 @@ class App(Funcs):
         self.scrolllista.place(relx=0.96,rely=0.1,relwidth=0.03,relheight=0.85) #função que define a posição da scrollbar
         
         self.lista.bind("<Double-1>", self.onDoubleClick)
+
+    def Menus(self):
+        menubar = Menu(self.root,bg="grey25")
+        self.root.config(menu=menubar)
+        filemenu = Menu(menubar)
+        filemenu2 = Menu(menubar)
+
+        def Quit(): 
+            self.root.destroy()
+
+        menubar.add_cascade(label= "Opções", menu= filemenu)
+        menubar.add_cascade(label= "sobre", menu= filemenu2)
+
+        filemenu.add_command(label="Sair", command= Quit)
+        filemenu2.add_command(label="Limpa Cliente", command= self.limpa_produto)
+
 App()   
 
