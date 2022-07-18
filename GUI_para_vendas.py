@@ -92,6 +92,19 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.select_lista()
         self.limpa_produto()
 
+    def busca_produto(self):
+        self.variaveis()
+        self.connect_db()
+        self.lista.delete(*self.lista.get_children())
+
+        self.nome_entry.insert(END, '%')
+        nome = self.nome_entry.get()
+        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % nome)
+        buscanomePROD = self.cursor.fetchall()
+        for i in buscanomePROD:
+            self.lista.insert("", END, values=i)
+        self.limpa_produto()
+        self.disconnect_db()
 
 class App(Funcs):
     def __init__(self):
@@ -127,7 +140,6 @@ class App(Funcs):
 
         #self.root.minsize(width=900, height=700) #define o tamanho minimo da janela
 
-
     def frames_da_tela(self): #metodo que cria e configura os frames
         
         self.frame_1 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3, bg= 'grey38') #Frame: cria o frame;bd=: borda; bg=: cor de fundo do frame; highlightbackground= cor da borda em volta do frame; highlightthickness= tamanho da borda em volta do frame
@@ -136,13 +148,12 @@ class App(Funcs):
         self.frame_2 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3,bg='grey38')
         self.frame_2.place(relx= 0.02, rely= 0.5, relwidth= 0.96, relheight= 0.46)
 
-
     def widgets_frame1(self): #função para criar botões 
         
         self.botao_limpar = Button(self.frame_1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
         self.botao_limpar.place(relx= 0.2, rely= 0.9, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
-        self.botao_buscar = Button(self.frame_1, text='Buscar', bg='grey29',highlightbackground='grey21') 
+        self.botao_buscar = Button(self.frame_1, text='Buscar', bg='grey29',highlightbackground='grey21', command=self.busca_produto) 
         self.botao_buscar.place(relx= 0.31, rely= 0.9, relwidth=0.1, relheight=0.15)
 
         self.botao_alterar = Button(self.frame_1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
@@ -181,7 +192,6 @@ class App(Funcs):
 
         self.lab_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
-
 
     def lista_frame2(self): #frame 2 4
         
