@@ -96,10 +96,8 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.variaveis()
         self.connect_db()
         self.lista.delete(*self.lista.get_children())
-
         self.nome_entry.insert(END, '%')
-        nome = self.nome_entry.get()
-        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % nome)
+        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
         buscanomePROD = self.cursor.fetchall()
         for i in buscanomePROD:
             self.lista.insert("", END, values=i)
@@ -144,53 +142,64 @@ class App(Funcs):
         
         self.frame_1 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3, bg= 'grey38') #Frame: cria o frame;bd=: borda; bg=: cor de fundo do frame; highlightbackground= cor da borda em volta do frame; highlightthickness= tamanho da borda em volta do frame
         self.frame_1.place(relx= 0.02, rely= 0.02, relwidth= 0.96, relheight= 0.46)  #função que defina a posição onde o objeto ficara posicionado na janela; baseado nos parametros relx, rely, relwidth e relheight que vão de 0 a 1
-
+        
         self.frame_2 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3,bg='grey38')
         self.frame_2.place(relx= 0.02, rely= 0.5, relwidth= 0.96, relheight= 0.46)
 
     def widgets_frame1(self): #função para criar botões 
+
+        self.abas = ttk.Notebook(self.frame_1)
+        self.aba1 = Frame(self.abas)
+        self.aba2 = Frame(self.abas)
+
+        self.aba1.configure(background="grey38")
+        self.aba2.configure(background="grey38")
+
+        self.abas.add(self.aba1, text="aba1")
+        self.abas.add(self.aba2, text="aba2")
+        self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
         
-        self.botao_limpar = Button(self.frame_1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
+        self.botao_limpar = Button(self.aba1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
         self.botao_limpar.place(relx= 0.2, rely= 0.9, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
-        self.botao_buscar = Button(self.frame_1, text='Buscar', bg='grey29',highlightbackground='grey21', command=self.busca_produto) 
+        self.botao_buscar = Button(self.aba1, text='Buscar', bg='grey29',highlightbackground='grey21', command=self.busca_produto) 
         self.botao_buscar.place(relx= 0.31, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_alterar = Button(self.frame_1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
+        self.botao_alterar = Button(self.aba1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_alterar.place(relx= 0.42, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_inserir = Button(self.frame_1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
+        self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.9, relwidth=0.1, relheight=0.15)
 
-        self.botao_apagar = Button(self.frame_1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
+        self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.9, relwidth=0.1, relheight=0.15)
 
         #LABELS
-        self.lb_nome = Label(self.frame_1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_nome = Label(self.aba1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
         self.lb_nome.place(relx= 0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
 
-        self.lb_preco = Label(self.frame_1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_preco = Label(self.aba1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
         self.lb_preco.place(relx= 0.75, rely= 0.1, relwidth=0.1, relheight=0.15)
 
-        self.lb_lab = Label(self.frame_1,text="Laboratorio:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_lab = Label(self.aba1,text="Laboratorio:", bg= 'grey38') #Função que cria uma Label 
         self.lb_lab.place(relx= 0.55, rely= 0.4, relwidth=0.16, relheight=0.15)
 
-        self.lb_modo = Label(self.frame_1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_modo = Label(self.aba1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
         self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
-        self.id_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
+        self.id_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
 
-        self.nome_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
+        self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.nome_entry.place(relx= 0.09, rely= 0.1, relwidth=0.65, relheight=0.15) #relwidth: tamanho da barra de entrada
 
-        self.preco_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
+        self.preco_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.15)
 
-        self.modo_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
+        self.modo_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.15)
 
-        self.lab_entry = Entry(self.frame_1,background='grey')  #Função que cria um entrada de texto
+        self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
 
     def lista_frame2(self): #frame 2 4
