@@ -93,17 +93,17 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.limpa_produto()
 
     def busca_produto(self):
-        self.variaveis()
         self.connect_db()
         self.lista.delete(*self.lista.get_children())
         self.nome_entry.insert(END, '%')
+        self.variaveis()
         self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
         buscanomePROD = self.cursor.fetchall()
         for i in buscanomePROD:
             self.lista.insert("", END, values=i)
         self.limpa_produto()
         self.disconnect_db()
-
+        
 class App(Funcs):
     def __init__(self):
         self.root = root
@@ -120,7 +120,7 @@ class App(Funcs):
 
         self.select_lista() #metodo para adicionar iten no treeview
 
-        self.Menus()
+        self.Menus() #metodo para adionar o menu
 
         root.mainloop() #mantem a janela aberta
 
@@ -148,31 +148,32 @@ class App(Funcs):
 
     def widgets_frame1(self): #função para criar botões 
 
-        self.abas = ttk.Notebook(self.frame_1)
+        self.abas = ttk.Notebook(self.frame_1) #cria um "notebook" para adicionar novas abas
         self.aba1 = Frame(self.abas)
         self.aba2 = Frame(self.abas)
 
         self.aba1.configure(background="grey38")
         self.aba2.configure(background="grey38")
 
-        self.abas.add(self.aba1, text="aba1")
+        self.abas.add(self.aba1, text="aba1") #cria a aba
         self.abas.add(self.aba2, text="aba2")
+
         self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
         
         self.botao_limpar = Button(self.aba1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
-        self.botao_limpar.place(relx= 0.2, rely= 0.9, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
+        self.botao_limpar.place(relx= 0.2, rely= 0.8, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
         self.botao_buscar = Button(self.aba1, text='Buscar', bg='grey29',highlightbackground='grey21', command=self.busca_produto) 
-        self.botao_buscar.place(relx= 0.31, rely= 0.9, relwidth=0.1, relheight=0.15)
+        self.botao_buscar.place(relx= 0.31, rely= 0.8, relwidth=0.1, relheight=0.15)
 
         self.botao_alterar = Button(self.aba1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
-        self.botao_alterar.place(relx= 0.42, rely= 0.9, relwidth=0.1, relheight=0.15)
+        self.botao_alterar.place(relx= 0.42, rely= 0.8, relwidth=0.1, relheight=0.15)
 
         self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
-        self.botao_inserir.place(relx= 0.53, rely= 0.9, relwidth=0.1, relheight=0.15)
+        self.botao_inserir.place(relx= 0.53, rely= 0.8, relwidth=0.1, relheight=0.15)
 
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
-        self.botao_apagar.place(relx= 0.64, rely= 0.9, relwidth=0.1, relheight=0.15)
+        self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
 
         #LABELS
         self.lb_nome = Label(self.aba1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
@@ -201,6 +202,13 @@ class App(Funcs):
 
         self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
+
+        self.tipvar = StringVar(self.aba2)
+        self.tipv = ("Vinicius", "Vileide")
+        self.tipvar.set("Vileide")
+        self.popmenu = OptionMenu(self.aba2, self.tipvar, *self.tipv)
+        self.popmenu.place(relx=0.1, rely=0.1, relwidth=0.2, relheight=0.2)
+        self.vendedor = self.tipvar.get()
 
     def lista_frame2(self): #frame 2 4
         
@@ -240,7 +248,7 @@ class App(Funcs):
         menubar.add_cascade(label= "sobre", menu= filemenu2)
 
         filemenu.add_command(label="Sair", command= Quit)
-        filemenu2.add_command(label="Limpa Cliente", command= self.limpa_produto)
+        filemenu2.add_command(label="Limpa Cliente", command= self.limpa_produto)       
 
 App()   
 
