@@ -248,7 +248,17 @@ class App(Funcs):
         menubar.add_cascade(label= "sobre", menu= filemenu2)
 
         filemenu.add_command(label="Sair", command= Quit)
-        filemenu2.add_command(label="Limpa Cliente", command= self.limpa_produto)       
+        filemenu2.add_command(label="Limpa Cliente", command= self.limpa_produto)
+
+    def window_2(self):
+        self.root_2 = Toplevel()
+        self.root_2.title("Janela 2")
+        self.root_2.configure(background="grey16")
+        self.root_2.geometry("400x200")
+        self.root_2.transient(self.root)
+        self.root_2.focus_force()
+        self.root_2.grab_set()
+        
 
 App()   
 
