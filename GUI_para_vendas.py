@@ -4,6 +4,15 @@ import sqlite3
 
 root = Tk() #variavel que inicia o tkinter
 
+class Validators:
+    def validate_preco(self, text):
+        if text == "": return True
+        try:
+            value = float(text)
+        except ValueError:
+            return False
+        return 0 <= value <= 10000
+
 class Funcs(): #classe que terá os metodos para o funcionamento dos botões 
 
     def limpa_produto(self): #metodo do botão limpar
@@ -27,7 +36,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
             CREATE TABLE IF NOT EXISTS produtos (
                 ID INTEGER PRIMARY KEY,
                 nome_produto CHAR(40) NOT NULL,
-                preco INTEGER NOT NULL,
+                preco REAL NOT NULL,
                 laboratorio CHAR(40),
                 modo_pagamento CHAR(40) NOT NULL    
             );
@@ -104,9 +113,11 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.limpa_produto()
         self.disconnect_db()
         
-class App(Funcs):
+class App(Funcs, Validators):
     def __init__(self):
         self.root = root
+
+        self.validatingEntrys()
 
         self.tela() #metedo de definções da janela
 
@@ -132,7 +143,9 @@ class App(Funcs):
 
         self.root.geometry("780x500") #metodo que define o tamanho padrão da janela
 
-        self.root.resizable(True, True) #define se o tamanho da janela pode ser alterado; primeiro parametro altura e o segundo a largura
+        #self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}") #metodo que define o tamanho padrão da janela
+
+        self.root.resizable(False, True) #define se o tamanho da janela pode ser alterado; primeiro parametro altura e o segundo a largura
 
         #self.root.maxsize(width=900, height=700) #define um tamanho maximo para a janela
 
@@ -175,6 +188,9 @@ class App(Funcs):
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
 
+        self.botao_window = Button(self.aba1, text='window',command=self.window_2, bg='grey29',highlightbackground='grey21') 
+        self.botao_window.place(relx= 0.8, rely= 0.8, relwidth=0.1, relheight=0.15)
+
         #LABELS
         self.lb_nome = Label(self.aba1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
         self.lb_nome.place(relx= 0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
@@ -192,16 +208,16 @@ class App(Funcs):
         self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
 
         self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.nome_entry.place(relx= 0.09, rely= 0.1, relwidth=0.65, relheight=0.15) #relwidth: tamanho da barra de entrada
+        self.nome_entry.place(relx= 0.09, rely= 0.12, relwidth=0.65, relheight=0.12) #relwidth: tamanho da barra de entrada
 
-        self.preco_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.15)
+        self.preco_entry = Entry(self.aba1,background='grey', validate='key', validatecommand= self.vend2)  #Função que cria um entrada de texto
+        self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.12)
 
         self.modo_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.15)
+        self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.12)
 
         self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.15)
+        self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
 
         self.tipvar = StringVar(self.aba2)
         self.tipv = ("Vinicius", "Vileide")
@@ -212,26 +228,32 @@ class App(Funcs):
 
     def lista_frame2(self): #frame 2 4
         
-        self.lista = ttk.Treeview(self.frame_2, height=3, columns=('col1','col2','col3','col4','col5')) #função que cria a treeview
+        self.lista = ttk.Treeview(self.frame_2, height=3, columns=('col1','col2','col3','col4','col5','col6')) #função que cria a treeview
         self.lista.heading('#0', text='') #função que cria o heading da coluna;"# " codigo da coluna; define o texto do heading
         self.lista.heading('#1', text='ID')
         self.lista.heading('#2', text='Nome')
         self.lista.heading('#3', text='Preço')
         self.lista.heading('#4', text='Modo de Pagamento')
         self.lista.heading('#5', text='Laboratorio')
+        self.lista.heading('#6', text='Vendedor')
 
-        self.lista.column('#0', width=1) #função que define a grossura da coluna na lista
-        self.lista.column('#1', width=1)
-        self.lista.column('#2', width=150)
-        self.lista.column('#3', width=50)
+        self.lista.column('#0', width=0,minwidth=0) #função que define a grossura da coluna na lista
+        self.lista.column('#1', width=50)
+        self.lista.column('#2', width=350)
+        self.lista.column('#3', width=100)
         self.lista.column('#4', width=200)
-        self.lista.column('#5', width=150)
+        self.lista.column('#5', width=200)
+        self.lista.column('#6', width=300)
 
-        self.lista.place(relx= 0.01, rely= 0.1, relwidth=0.95, relheight=0.85) #função que define a posição da tabela
+        self.lista.place(relx= 0.0001, rely= 0.001, relwidth=0.99, relheight=0.99) #função que define a posição da tabela
 
         self.scrolllista = Scrollbar(self.frame_2,orient='vertical',command=self.lista.yview) #função que cria uma scrollbar; define o sentido da scrollbar
         self.lista.configure(yscroll=self.scrolllista.set) #função que faz a fusão da tabela com a scrollbar
-        self.scrolllista.place(relx=0.96,rely=0.1,relwidth=0.03,relheight=0.85) #função que define a posição da scrollbar
+        self.scrolllista.place(relx=0.98,rely=0.001,relwidth=0.02,relheight=0.99) #função que define a posição da scrollbar
+
+        self.scrollh = Scrollbar(self.frame_2, orient='horizontal', command=self.lista.xview)
+        self.lista.configure(xscroll=self.scrollh.set)
+        self.scrollh.place(relx=0.0001,rely=0.91,relwidth=.98,relheight=0.08)
         
         self.lista.bind("<Double-1>", self.onDoubleClick)
 
@@ -257,8 +279,10 @@ class App(Funcs):
         self.root_2.geometry("400x200")
         self.root_2.transient(self.root)
         self.root_2.focus_force()
-        self.root_2.grab_set()
-        
+        self.root_2.grab_set()        
+
+    def validatingEntrys(self):
+        self.vend2 = (self.root.register(self.validate_preco), "%P")
 
 App()   
 
