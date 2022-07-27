@@ -6,7 +6,8 @@ root = Tk() #variavel que inicia o tkinter
 
 class Validators:
     def validate_preco(self, text):
-        if text == "": return True
+        if text == "": 
+            return True
         try:
             value = float(text)
         except ValueError:
@@ -63,6 +64,17 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.select_lista() 
         self.limpa_produto()
 
+    def enterBind(self, event): #metodo para adionar produtos no database
+        self.variaveis()
+        self.connect_db() #conecta ao database
+
+        self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento)
+            VALUES(?, ?, ? ,?)""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+        self.connect.commit() #commita as mudanças
+        self.disconnect_db() #disconecta do database
+        self.select_lista() 
+        self.limpa_produto()
+
     def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
 
         self.lista.delete(*self.lista.get_children()) 
@@ -84,6 +96,15 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
             self.modo_entry.insert(END,col4)
 
     def deleta_produto(self):
+        self.variaveis()
+        self.connect_db()
+        self.cursor.execute("""DELETE FROM produtos WHERE ID = ? """, (self.id,))
+        self.connect.commit()
+        self.disconnect_db()
+        self.limpa_produto()
+        self.select_lista()
+
+    def deleteBind(self, event):
         self.variaveis()
         self.connect_db()
         self.cursor.execute("""DELETE FROM produtos WHERE ID = ? """, (self.id,))
@@ -185,8 +206,12 @@ class App(Funcs, Validators):
         self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.8, relwidth=0.1, relheight=0.15)
 
+        self.root.bind("<Return>", self.enterBind)
+
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
+
+        self.root.bind("<Delete>", self.deleteBind)
 
         self.botao_window = Button(self.aba1, text='window',command=self.window_2, bg='grey29',highlightbackground='grey21') 
         self.botao_window.place(relx= 0.8, rely= 0.8, relwidth=0.1, relheight=0.15)
