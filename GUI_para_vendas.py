@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import sqlite3
 
-root = Tk() #variavel que inicia o tkinter
+root = Tk() #variavel que recebe o tkinter
 
 class Validators:
     def validate_preco(self, text):
@@ -63,6 +63,8 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.disconnect_db() #disconecta do database
         self.select_lista() 
         self.limpa_produto()
+        self.nome_entry.focus()
+
 
     def enterBind(self, event): #metodo para adionar produtos no database
         self.variaveis()
@@ -74,6 +76,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.disconnect_db() #disconecta do database
         self.select_lista() 
         self.limpa_produto()
+        self.nome_entry.focus()
 
     def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
 
@@ -154,6 +157,8 @@ class App(Funcs, Validators):
 
         self.Menus() #metodo para adionar o menu
 
+        self.Enter()
+
         root.mainloop() #mantem a janela aberta
 
     def tela(self): #metodo que configura a aparencia da janela
@@ -206,7 +211,7 @@ class App(Funcs, Validators):
         self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.8, relwidth=0.1, relheight=0.15)
 
-        self.root.bind("<Return>", self.enterBind)
+        #self.root.bind("<Return>", self.enterBind)
 
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
@@ -309,5 +314,8 @@ class App(Funcs, Validators):
     def validatingEntrys(self):
         self.vend2 = (self.root.register(self.validate_preco), "%P")
 
-App()   
+    def Enter(self):
+        self.root.bind("<Return>", self.enterBind)
+        self.nome_entry.focus()
 
+App()
