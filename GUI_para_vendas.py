@@ -68,15 +68,16 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
 
     def enterBind(self, event): #metodo para adionar produtos no database
         self.variaveis()
-        self.connect_db() #conecta ao database
+        if self.nome != "":
+            self.connect_db() #conecta ao database
 
-        self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento)
-            VALUES(?, ?, ? ,?)""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
-        self.connect.commit() #commita as mudanças
-        self.disconnect_db() #disconecta do database
-        self.select_lista() 
-        self.limpa_produto()
-        self.nome_entry.focus()
+            self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento)
+                VALUES(?, ?, ? ,?)""", (self.nome.capitalize().strip(), self.preco, self.laboratorio, self.modo_pagamento)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+            self.connect.commit() #commita as mudanças
+            self.disconnect_db() #disconecta do database
+            self.select_lista() 
+            self.limpa_produto()
+            self.nome_entry.focus()
 
     def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
 
@@ -85,7 +86,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         listadb = self.cursor.execute(""" SELECT ID, nome_produto, preco, modo_pagamento, laboratorio FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
         for i in listadb:
             self.lista.insert("", END, values=i) #adiciona os itens de listadb ao treeview 'lista'
-        self.disconnect_db() #desconecta database
+        self.disconnect_db() #desconecta databasew
 
     def onDoubleClick(self,event): #metodo para adicionar o double click nos itens do treeview
         self.limpa_produto()
@@ -157,7 +158,7 @@ class App(Funcs, Validators):
 
         self.Menus() #metodo para adionar o menu
 
-        self.Enter()
+        self.Binds()
 
         root.mainloop() #mantem a janela aberta
 
@@ -215,8 +216,6 @@ class App(Funcs, Validators):
 
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
-
-        self.root.bind("<Delete>", self.deleteBind)
 
         self.botao_window = Button(self.aba1, text='window',command=self.window_2, bg='grey29',highlightbackground='grey21') 
         self.botao_window.place(relx= 0.8, rely= 0.8, relwidth=0.1, relheight=0.15)
@@ -309,13 +308,22 @@ class App(Funcs, Validators):
         self.root_2.geometry("400x200")
         self.root_2.transient(self.root)
         self.root_2.focus_force()
-        self.root_2.grab_set()        
+        self.root_2.grab_set()
+
+        self.frame_4 = Frame(self.root_2, bd= 10, highlightbackground='grey21',highlightthickness=3, bg= 'grey38') #Frame: cria o frame;bd=: borda; bg=: cor de fundo do frame; highlightbackground= cor da borda em volta do frame; highlightthickness= tamanho da borda em volta do frame
+        self.frame_4.place(relx= 0.02, rely= 0.02, relwidth= 0.96, relheight= 0.46)  #função que defina a posição onde o objeto ficara posicionado na janela; baseado nos parametros relx, rely, relwidth e relheight que vão de 0 a 1
+        
+        self.frame_5 = Frame(self.root_2, bd= 10, highlightbackground='grey21',highlightthickness=3,bg='grey38')
+        self.frame_5.place(relx= 0.02, rely= 0.5, relwidth= 0.96, relheight= 0.46)
+        self.root_2.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}")
+
+        self.root_2.resizable(True, True)   
 
     def validatingEntrys(self):
         self.vend2 = (self.root.register(self.validate_preco), "%P")
 
-    def Enter(self):
+    def Binds(self):
         self.root.bind("<Return>", self.enterBind)
-        self.nome_entry.focus()
+        self.root.bind("<Delete>", self.deleteBind)
 
 App()
