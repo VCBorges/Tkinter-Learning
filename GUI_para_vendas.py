@@ -21,7 +21,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.nome_entry.delete(0, END) #faz o botão limpar funcionar na entry relacionada
         self.preco_entry.delete(0, END)
         self.lab_entry.delete(0, END)
-        self.modo_entry.delete(0, END)
+        #self.modo_entry.delete(0, END)
         self.quantidade_entry.delete(0, END)
     
     def connect_db(self): #função que cria um database e conecta ele ao tkinter
@@ -113,7 +113,6 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
             self.quantidade_entry.insert(END,col3)
             self.lab_entry.insert(END,col4)
             self.preco_entry.insert(END,col5)
-            self.modo_entry.insert(END, col6)
 
     def deleta_produto(self):
         self.variaveis()
@@ -259,14 +258,15 @@ class App(Funcs, Validators):
         self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.12)
 
         self.lista_modo = ['Dinheiro','Cartão Debito','Cartão Credito','Conta']
-        self.modo_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
+        self.modo_entry = ttk.Combobox(self.aba1,values=self.lista_modo, state='readonly',background='grey')  #Função que cria um entrada de texto
         self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.12)
+        self.modo_entry.set('Dinheiro')
 
         self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
 
         self.lista_vendedor = ['Vileide','Vinicius','Marcio']
-        self.combo_vendedor = ttk.Combobox(self.aba1,values=self.lista_vendedor)
+        self.combo_vendedor = ttk.Combobox(self.aba1,values=self.lista_vendedor, state='readonly',background='grey')
         self.combo_vendedor.place(relx=0.698, rely=0.6, relwidth=0.15, relheight=0.12)
         self.combo_vendedor.set('Vileide')
 
@@ -275,6 +275,11 @@ class App(Funcs, Validators):
 
         self.quantidade_entry = Entry(self.aba2,background='grey')
         self.quantidade_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
+
+        self.total_entry = Entry(self.aba1,background='grey')
+        self.total_entry.place(relx= 0.22, rely= 0.6, relwidth=0.3, relheight=0.12)
+        self.total_entry.insert(0,'a')
+
 
         """self.tipvar = StringVar(self.aba2)
         self.tipv = ("Vinicius", "Vileide")
@@ -351,7 +356,6 @@ class App(Funcs, Validators):
 
         self.root_2.resizable(True, True)   
         
-
     def validatingEntrys(self):
         self.vend2 = (self.root.register(self.validate_preco), "%P")
 
