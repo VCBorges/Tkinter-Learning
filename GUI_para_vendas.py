@@ -22,6 +22,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.preco_entry.delete(0, END)
         self.lab_entry.delete(0, END)
         self.modo_entry.delete(0, END)
+        self.quantidade_entry.delete(0, END)
     
     def connect_db(self): #função que cria um database e conecta ele ao tkinter
         self.connect = sqlite3.connect("produtos.db") #cria um database
@@ -39,7 +40,9 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
                 nome_produto CHAR(40) NOT NULL,
                 preco REAL NOT NULL,
                 laboratorio CHAR(40),
-                modo_pagamento CHAR(40) NOT NULL    
+                vendedor CHAR(10),
+                quantidade INTEGER,
+                modo_pagamento CHAR(40) NOT NULL
             );
         """) #cria uma tabela no database
         self.connect.commit(); print("banco de dados criação")
@@ -51,14 +54,18 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.preco = self.preco_entry.get() #variavel que recebe o conteudo que esta na entry *preco_entry
         self.modo_pagamento = self.modo_entry.get() #variavel que recebe o conteudo que esta na entry *modo_entry
         self.laboratorio = self.lab_entry.get() #variavel que recebe o conteudo que esta na entry *lab_entry
+        self.vendedor = self.combo_vendedor.get()
+        self.quantidade = self.quantidade_entry.get()
+        #self.total = float(self.preco) * int(self.quantidade)
+        
     
     def add_prod(self): #metodo para adionar produtos no database
         
         self.variaveis()
         self.connect_db() #conecta ao database
 
-        self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento)
-            VALUES(?, ?, ? ,?)""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+        self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade)
+            VALUES(?, ?, ? ,?, ?, ?)""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento, self.vendedor, self.quantidade)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
         self.connect.commit() #commita as mudanças
         self.disconnect_db() #disconecta do database
         self.select_lista() 
@@ -71,8 +78,8 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         if self.nome != "":
             self.connect_db() #conecta ao database
 
-            self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento)
-                VALUES(?, ?, ? ,?)""", (self.nome.capitalize().strip(), self.preco, self.laboratorio, self.modo_pagamento)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+            self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade)
+                VALUES(?, ?, ? ,?, ?, ?)""", (self.nome.capitalize().strip(), self.preco, self.laboratorio, self.modo_pagamento, self.vendedor, self.quantidade)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
             self.connect.commit() #commita as mudanças
             self.disconnect_db() #disconecta do database
             self.select_lista() 
@@ -83,7 +90,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
 
         self.lista.delete(*self.lista.get_children()) 
         self.connect_db() #conecta ao database
-        listadb = self.cursor.execute(""" SELECT ID, nome_produto, preco, modo_pagamento, laboratorio FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
+        listadb = self.cursor.execute(""" SELECT ID, nome_produto, preco, modo_pagamento, laboratorio, vendedor, quantidade FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
         for i in listadb:
             self.lista.insert("", END, values=i) #adiciona os itens de listadb ao treeview 'lista'
         self.disconnect_db() #desconecta databasew
@@ -92,12 +99,14 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.limpa_produto()
 
         for n in self.lista.selection(): #laço que adiciona o conteudo da TreeView nos respectivos entrys
-            col1, col2, col3, col4, col5 = self.lista.item(n, 'values')
+            col1, col2, col3, col4, col5, col7, col6 = self.lista.item(n, 'values')
             self.id_entry.insert(END, col1)
             self.nome_entry.insert(END,col2)
             self.preco_entry.insert(END,col3)
             self.lab_entry.insert(END,col5)
-            self.modo_entry.insert(END,col4)
+            self.modo_entry.insert(END, col4)
+            self.quantidade_entry.insert(END,col6)
+            
 
     def deleta_produto(self):
         self.variaveis()
@@ -131,7 +140,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.lista.delete(*self.lista.get_children())
         self.nome_entry.insert(END, '%')
         self.variaveis()
-        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
+        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
         buscanomePROD = self.cursor.fetchall()
         for i in buscanomePROD:
             self.lista.insert("", END, values=i)
@@ -168,9 +177,9 @@ class App(Funcs, Validators):
 
         self.root.configure(background='grey29')   #define a cor do background da janela; pode ser uma imagem png tbm
 
-        self.root.geometry("780x500") #metodo que define o tamanho padrão da janela
+        #self.root.geometry("780x500") #metodo que define o tamanho padrão da janela
 
-        #self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}") #metodo que define o tamanho padrão da janela
+        self.root.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}") #metodo que define o tamanho padrão da janela
 
         self.root.resizable(False, True) #define se o tamanho da janela pode ser alterado; primeiro parametro altura e o segundo a largura
 
@@ -212,8 +221,6 @@ class App(Funcs, Validators):
         self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.8, relwidth=0.1, relheight=0.15)
 
-        #self.root.bind("<Return>", self.enterBind)
-
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
 
@@ -222,7 +229,7 @@ class App(Funcs, Validators):
 
         #LABELS
         self.lb_nome = Label(self.aba1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
-        self.lb_nome.place(relx= 0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
+        self.lb_nome.place(relx=0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
 
         self.lb_preco = Label(self.aba1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
         self.lb_preco.place(relx= 0.75, rely= 0.1, relwidth=0.1, relheight=0.15)
@@ -234,10 +241,10 @@ class App(Funcs, Validators):
         self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
         self.id_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
+        #self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
 
         self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.nome_entry.place(relx= 0.09, rely= 0.12, relwidth=0.65, relheight=0.12) #relwidth: tamanho da barra de entrada
+        self.nome_entry.place(relx= 0.075, rely= 0.12, relwidth=0.65, relheight=0.12) #relwidth: tamanho da barra de entrada
 
         self.preco_entry = Entry(self.aba1,background='grey', validate='key', validatecommand= self.vend2)  #Função que cria um entrada de texto
         self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.12)
@@ -248,16 +255,27 @@ class App(Funcs, Validators):
         self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
 
-        self.tipvar = StringVar(self.aba2)
+        self.lista_vendedor = ['Vileide','Vinicius','Marcio']
+        self.combo_vendedor = ttk.Combobox(self.aba1,values=self.lista_vendedor)
+        self.combo_vendedor.place(relx=0.698, rely=0.6, relwidth=0.15, relheight=0.12)
+        self.combo_vendedor.set('Vileide')
+
+        self.lb_quantidade = Label(self.aba2,text="Quantidade:", bg= 'grey38')
+        self.lb_quantidade.place(relx= 0.55, rely= 0.4, relwidth=0.16, relheight=0.15)
+
+        self.quantidade_entry = Entry(self.aba2,background='grey')
+        self.quantidade_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
+
+        """self.tipvar = StringVar(self.aba2)
         self.tipv = ("Vinicius", "Vileide")
         self.tipvar.set("Vileide")
         self.popmenu = OptionMenu(self.aba2, self.tipvar, *self.tipv)
         self.popmenu.place(relx=0.1, rely=0.1, relwidth=0.2, relheight=0.2)
-        self.vendedor = self.tipvar.get()
+        self.vendedor = self.tipvar.get()"""
 
     def lista_frame2(self): #frame 2 4
         
-        self.lista = ttk.Treeview(self.frame_2, height=3, columns=('col1','col2','col3','col4','col5','col6')) #função que cria a treeview
+        self.lista = ttk.Treeview(self.frame_2, height=3, columns=('col1','col2','col3','col4','col5','col6','col7','col8')) #função que cria a treeview
         self.lista.heading('#0', text='') #função que cria o heading da coluna;"# " codigo da coluna; define o texto do heading
         self.lista.heading('#1', text='ID')
         self.lista.heading('#2', text='Nome')
@@ -265,14 +283,18 @@ class App(Funcs, Validators):
         self.lista.heading('#4', text='Modo de Pagamento')
         self.lista.heading('#5', text='Laboratorio')
         self.lista.heading('#6', text='Vendedor')
+        self.lista.heading('#7', text='Quantidade')
+        #self.lista.heading('#8', text='Total')
 
         self.lista.column('#0', width=0,minwidth=0) #função que define a grossura da coluna na lista
         self.lista.column('#1', width=50)
-        self.lista.column('#2', width=350)
-        self.lista.column('#3', width=100)
+        self.lista.column('#2', width=200)
+        self.lista.column('#3', width=200)
         self.lista.column('#4', width=200)
         self.lista.column('#5', width=200)
-        self.lista.column('#6', width=300)
+        self.lista.column('#6', width=200)
+        self.lista.column('#7', width=100)
+        #self.lista.column('#8', width=130)
 
         self.lista.place(relx= 0.0001, rely= 0.001, relwidth=0.99, relheight=0.99) #função que define a posição da tabela
 
@@ -318,6 +340,7 @@ class App(Funcs, Validators):
         self.root_2.geometry(f"{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}")
 
         self.root_2.resizable(True, True)   
+        
 
     def validatingEntrys(self):
         self.vend2 = (self.root.register(self.validate_preco), "%P")
