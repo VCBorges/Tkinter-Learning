@@ -35,14 +35,15 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.connect_db(); print("connecting to database...")  #exite uma mensagem de carregamento enquanto o database é conectado
 
         self.cursor.execute("""   
-            CREATE TABLE IF NOT EXISTS produtos (
-                ID INTEGER PRIMARY KEY,
-                nome_produto CHAR(40) NOT NULL,
-                preco REAL NOT NULL,
-                laboratorio CHAR(40),
-                vendedor CHAR(10),
-                quantidade INTEGER,
-                modo_pagamento CHAR(40) NOT NULL
+            CREATE TABLE IF NOT EXISTS produtos ( 
+                ID INTEGER PRIMARY KEY,               /*col1*/
+                nome_produto CHAR(40) NOT NULL,       /*col2*/
+                quantidade INTEGER,                   /*col3*/
+                laboratorio CHAR(40),                 /*col4*/
+                preco REAL NOT NULL,                  /*col5*/
+                modo_pagamento CHAR(40) NOT NULL,     /*col6*/
+                vendedor CHAR(10),                    /*col7*/
+                total INTEGER                         /*col8*/
             );
         """) #cria uma tabela no database
         self.connect.commit(); print("banco de dados criação")
@@ -58,55 +59,61 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.quantidade = self.quantidade_entry.get()
         #self.total = float(self.preco) * int(self.quantidade)
         
-    
     def add_prod(self): #metodo para adionar produtos no database
-        
-        self.variaveis()
-        self.connect_db() #conecta ao database
-
-        self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade)
-            VALUES(?, ?, ? ,?, ?, ?)""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento, self.vendedor, self.quantidade)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
-        self.connect.commit() #commita as mudanças
-        self.disconnect_db() #disconecta do database
-        self.select_lista() 
-        self.limpa_produto()
-        self.nome_entry.focus()
-
-
-    def enterBind(self, event): #metodo para adionar produtos no database
         self.variaveis()
         if self.nome != "":
             self.connect_db() #conecta ao database
-
-            self.cursor.execute(""" INSERT INTO produtos (nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade)
-                VALUES(?, ?, ? ,?, ?, ?)""", (self.nome.capitalize().strip(), self.preco, self.laboratorio, self.modo_pagamento, self.vendedor, self.quantidade)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+            self.cursor.execute(""" INSERT INTO produtos (
+                nome_produto,
+                quantidade,
+                laboratorio, 
+                preco, 
+                modo_pagamento, 
+                vendedor)
+                VALUES(?, ?, ? ,?, ?, ?)""", (self.nome, self.quantidade, self.laboratorio, self.preco, self.modo_pagamento, self.vendedor)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
             self.connect.commit() #commita as mudanças
             self.disconnect_db() #disconecta do database
             self.select_lista() 
             self.limpa_produto()
             self.nome_entry.focus()
 
-    def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
+    def enterBind(self, event): #metodo para adionar produtos no database
+        self.variaveis()
+        if self.nome != "":
+            self.connect_db() #conecta ao database
+            self.cursor.execute(""" INSERT INTO produtos (
+                nome_produto,
+                quantidade,
+                laboratorio, 
+                preco, 
+                modo_pagamento, 
+                vendedor)
+                VALUES(?, ?, ? ,?, ?, ?)""", (self.nome, self.quantidade, self.laboratorio, self.preco, self.modo_pagamento, self.vendedor)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+            self.connect.commit() #commita as mudanças
+            self.disconnect_db() #disconecta do database
+            self.select_lista() 
+            self.limpa_produto()
+            self.nome_entry.focus()
+        
 
+    def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
         self.lista.delete(*self.lista.get_children()) 
         self.connect_db() #conecta ao database
-        listadb = self.cursor.execute(""" SELECT ID, nome_produto, preco, modo_pagamento, laboratorio, vendedor, quantidade FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
+        listadb = self.cursor.execute(""" SELECT ID, nome_produto, quantidade, laboratorio, preco, modo_pagamento, vendedor FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
         for i in listadb:
             self.lista.insert("", END, values=i) #adiciona os itens de listadb ao treeview 'lista'
         self.disconnect_db() #desconecta databasew
 
     def onDoubleClick(self,event): #metodo para adicionar o double click nos itens do treeview
         self.limpa_produto()
-
         for n in self.lista.selection(): #laço que adiciona o conteudo da TreeView nos respectivos entrys
             col1, col2, col3, col4, col5, col7, col6 = self.lista.item(n, 'values')
             self.id_entry.insert(END, col1)
             self.nome_entry.insert(END,col2)
-            self.preco_entry.insert(END,col3)
-            self.lab_entry.insert(END,col5)
-            self.modo_entry.insert(END, col4)
-            self.quantidade_entry.insert(END,col6)
-            
+            self.quantidade_entry.insert(END,col3)
+            self.lab_entry.insert(END,col4)
+            self.preco_entry.insert(END,col5)
+            self.modo_entry.insert(END, col6)
 
     def deleta_produto(self):
         self.variaveis()
@@ -129,7 +136,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
     def altera_produto(self):
         self.variaveis()
         self.connect_db()
-        self.cursor.execute(""" UPDATE produtos SET nome_produto = ?, preco = ?, laboratorio = ?, modo_pagamento = ? WHERE ID = ?""", (self.nome, self.preco, self.laboratorio, self.modo_pagamento, self.id))
+        self.cursor.execute(""" UPDATE produtos SET nome_produto = ?, quantidade = ?, laboratorio = ?, preco = ?, modo_pagamento = ?, vendedor = ? WHERE ID = ?""", (self.nome, self.quantidade,self.laboratorio, self.preco, self.modo_pagamento, self.vendedor, self.id))
         self.connect.commit()
         self.disconnect_db()
         self.select_lista()
@@ -140,7 +147,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.lista.delete(*self.lista.get_children())
         self.nome_entry.insert(END, '%')
         self.variaveis()
-        self.cursor.execute(""" SELECT ID, nome_produto, preco, laboratorio, modo_pagamento, vendedor, quantidade FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
+        self.cursor.execute(""" SELECT ID, nome_produto, quantidade, laboratorio, preco, modo_pagamento, vendedor FROM produtos WHERE nome_produto LIKE '%s' ORDER BY nome_produto ASC """ % self.nome)
         buscanomePROD = self.cursor.fetchall()
         for i in buscanomePROD:
             self.lista.insert("", END, values=i)
@@ -195,8 +202,9 @@ class App(Funcs, Validators):
         self.frame_2 = Frame(self.root, bd= 10, highlightbackground='grey21',highlightthickness=3,bg='grey38')
         self.frame_2.place(relx= 0.02, rely= 0.5, relwidth= 0.96, relheight= 0.46)
 
-    def widgets_frame1(self): #função para criar botões 
+    def widgets_frame1(self): #função para criar botões
 
+        #Abas
         self.abas = ttk.Notebook(self.frame_1) #cria um "notebook" para adicionar novas abas
         self.aba1 = Frame(self.abas)
         self.aba2 = Frame(self.abas)
@@ -209,6 +217,7 @@ class App(Funcs, Validators):
 
         self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
         
+        #Buttons
         self.botao_limpar = Button(self.aba1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
         self.botao_limpar.place(relx= 0.2, rely= 0.8, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
@@ -240,7 +249,7 @@ class App(Funcs, Validators):
         self.lb_modo = Label(self.aba1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
         self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
-        self.id_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
+        self.id_entry = Entry(self.aba1)  #Função que cria um entrada de texto
         #self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
 
         self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
@@ -249,6 +258,7 @@ class App(Funcs, Validators):
         self.preco_entry = Entry(self.aba1,background='grey', validate='key', validatecommand= self.vend2)  #Função que cria um entrada de texto
         self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.12)
 
+        self.lista_modo = ['Dinheiro','Cartão Debito','Cartão Credito','Conta']
         self.modo_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
         self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.12)
 
@@ -279,11 +289,11 @@ class App(Funcs, Validators):
         self.lista.heading('#0', text='') #função que cria o heading da coluna;"# " codigo da coluna; define o texto do heading
         self.lista.heading('#1', text='ID')
         self.lista.heading('#2', text='Nome')
-        self.lista.heading('#3', text='Preço')
-        self.lista.heading('#4', text='Modo de Pagamento')
-        self.lista.heading('#5', text='Laboratorio')
-        self.lista.heading('#6', text='Vendedor')
-        self.lista.heading('#7', text='Quantidade')
+        self.lista.heading('#3', text='Quantidade')
+        self.lista.heading('#4', text='Laboratorio')
+        self.lista.heading('#5', text='Preço')
+        self.lista.heading('#6', text='Modo de Pagamento')
+        self.lista.heading('#7', text='Vendedor')
         #self.lista.heading('#8', text='Total')
 
         self.lista.column('#0', width=0,minwidth=0) #função que define a grossura da coluna na lista
