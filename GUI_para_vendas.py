@@ -23,6 +23,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         self.lab_entry.delete(0, END)
         #self.modo_entry.delete(0, END)
         self.quantidade_entry.delete(0, END)
+        self.total_entry.delete(0, END)
     
     def connect_db(self): #função que cria um database e conecta ele ao tkinter
         self.connect = sqlite3.connect("produtos.db") #cria um database
@@ -61,6 +62,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
         
     def add_prod(self): #metodo para adionar produtos no database
         self.variaveis()
+        self.total = float(self.quantidade)*float(self.preco)
         if self.nome != "":
             self.connect_db() #conecta ao database
             self.cursor.execute(""" INSERT INTO produtos (
@@ -69,8 +71,9 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
                 laboratorio, 
                 preco, 
                 modo_pagamento, 
-                vendedor)
-                VALUES(?, ?, ? ,?, ?, ?)""", (self.nome, self.quantidade, self.laboratorio, self.preco, self.modo_pagamento, self.vendedor)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
+                vendedor,
+                total)
+                VALUES(?, ?, ? ,?, ?, ?,?)""", (self.nome, self.quantidade, self.laboratorio, self.preco, self.modo_pagamento, self.vendedor, self.total)) #abre o cursor para receber um comando SQL de adicionar itens ao database; as variaveis subtituem os '?'
             self.connect.commit() #commita as mudanças
             self.disconnect_db() #disconecta do database
             self.select_lista() 
@@ -99,7 +102,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
     def select_lista(self): #metodo para selecionar os itens do database e adionar ao treeview
         self.lista.delete(*self.lista.get_children()) 
         self.connect_db() #conecta ao database
-        listadb = self.cursor.execute(""" SELECT ID, nome_produto, quantidade, laboratorio, preco, modo_pagamento, vendedor FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
+        listadb = self.cursor.execute(""" SELECT ID, nome_produto, quantidade, laboratorio, preco, modo_pagamento, vendedor, total FROM produtos""") #variavel que recebe o conteudo do comando SQL SELECT
         for i in listadb:
             self.lista.insert("", END, values=i) #adiciona os itens de listadb ao treeview 'lista'
         self.disconnect_db() #desconecta databasew
@@ -107,12 +110,14 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
     def onDoubleClick(self,event): #metodo para adicionar o double click nos itens do treeview
         self.limpa_produto()
         for n in self.lista.selection(): #laço que adiciona o conteudo da TreeView nos respectivos entrys
-            col1, col2, col3, col4, col5, col7, col6 = self.lista.item(n, 'values')
+            col1, col2, col3, col4, col5, col7, col6,col8 = self.lista.item(n, 'values')
             self.id_entry.insert(END, col1)
             self.nome_entry.insert(END,col2)
             self.quantidade_entry.insert(END,col3)
             self.lab_entry.insert(END,col4)
             self.preco_entry.insert(END,col5)
+            
+
 
     def deleta_produto(self):
         self.variaveis()
@@ -152,7 +157,7 @@ class Funcs(): #classe que terá os metodos para o funcionamento dos botões
             self.lista.insert("", END, values=i)
         self.limpa_produto()
         self.disconnect_db()
-        
+
 class App(Funcs, Validators):
     def __init__(self):
         self.root = root
@@ -216,70 +221,84 @@ class App(Funcs, Validators):
 
         self.abas.place(relx=0, rely=0, relwidth=1, relheight=1)
         
-        #Buttons
+        #BOTAO LIMPAR
         self.botao_limpar = Button(self.aba1, text='Limpar',command=self.limpa_produto, bg='grey29',highlightbackground='grey21') #Button: cria o botão; self.frame onde ele estara, text= texto que estara escrito no botão, bd=: tipo de borda;fg=: cor do texto;font=: fonte do texto;
         self.botao_limpar.place(relx= 0.2, rely= 0.8, relwidth=0.1, relheight=0.15) #função que define a posição do botão e o seu tamanho
 
+        #BOTAO BUSCAR
         self.botao_buscar = Button(self.aba1, text='Buscar', bg='grey29',highlightbackground='grey21', command=self.busca_produto) 
         self.botao_buscar.place(relx= 0.31, rely= 0.8, relwidth=0.1, relheight=0.15)
 
+        #BOTAO ALTERAR
         self.botao_alterar = Button(self.aba1, text='Alterar', command=self.altera_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_alterar.place(relx= 0.42, rely= 0.8, relwidth=0.1, relheight=0.15)
 
+        #BOTAO INSERIR
         self.botao_inserir = Button(self.aba1, text='Inserir', command=self.add_prod, bg='grey29',highlightbackground='grey21') 
         self.botao_inserir.place(relx= 0.53, rely= 0.8, relwidth=0.1, relheight=0.15)
 
+        #BOTAO INSERIR
         self.botao_apagar = Button(self.aba1, text='Apagar',command=self.deleta_produto, bg='grey29',highlightbackground='grey21') 
         self.botao_apagar.place(relx= 0.64, rely= 0.8, relwidth=0.1, relheight=0.15)
 
         self.botao_window = Button(self.aba1, text='window',command=self.window_2, bg='grey29',highlightbackground='grey21') 
         self.botao_window.place(relx= 0.8, rely= 0.8, relwidth=0.1, relheight=0.15)
 
-        #LABELS
+        self.id_entry = Entry(self.aba1)
+        #self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
+
+        #NOME
         self.lb_nome = Label(self.aba1,text="Nome:", bg= 'grey38') #Função que cria uma Label 
         self.lb_nome.place(relx=0.001, rely= 0.1, relwidth=0.1, relheight=0.15)
 
-        self.lb_preco = Label(self.aba1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
-        self.lb_preco.place(relx= 0.75, rely= 0.1, relwidth=0.1, relheight=0.15)
+        self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
+        self.nome_entry.place(relx= 0.075, rely= 0.12, relwidth=0.4, relheight=0.12) #relwidth: tamanho da barra de entrada
 
+        #QUANTIDADE
+        self.lb_quantidade = Label(self.aba1,text="Quantidade:", bg='grey38')
+        self.lb_quantidade.place(relx= 0.5, rely= 0.1, relwidth=0.1, relheight=0.15)
+
+        self.quantidade_entry = Entry(self.aba1,background='grey')
+        self.quantidade_entry.place(relx= 0.59, rely= 0.12, relwidth=0.08, relheight=0.12)
+        self.quantidade_entry.insert(0,'0')
+
+        #LABORATORIO
         self.lb_lab = Label(self.aba1,text="Laboratorio:", bg= 'grey38') #Função que cria uma Label 
         self.lb_lab.place(relx= 0.55, rely= 0.4, relwidth=0.16, relheight=0.15)
 
-        self.lb_modo = Label(self.aba1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
-        self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
+        self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
+        self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
 
-        self.id_entry = Entry(self.aba1)  #Função que cria um entrada de texto
-        #self.id_entry.place(relx= 0.09, rely= 0.6, relwidth=0.1, relheight=0.15) #relwidth: tamanho da barra de entrada
-
-        self.nome_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.nome_entry.place(relx= 0.075, rely= 0.12, relwidth=0.65, relheight=0.12) #relwidth: tamanho da barra de entrada
+        #PREÇO
+        self.lb_preco = Label(self.aba1,text="Preço:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_preco.place(relx= 0.727, rely= 0.1, relwidth=0.1, relheight=0.15)
 
         self.preco_entry = Entry(self.aba1,background='grey', validate='key', validatecommand= self.vend2)  #Função que cria um entrada de texto
-        self.preco_entry.place(relx= 0.84, rely= 0.1, relwidth=0.15, relheight=0.12)
+        self.preco_entry.place(relx= 0.8, rely= 0.12, relwidth=0.15, relheight=0.12)
+        self.preco_entry.insert(0,'0')
+
+        #MODO DE PAGAMENTO
+        self.lb_modo = Label(self.aba1,text="Modo de Pagamento:", bg= 'grey38') #Função que cria uma Label 
+        self.lb_modo.place(relx= 0.001, rely= 0.4, relwidth=0.228, relheight=0.15)
 
         self.lista_modo = ['Dinheiro','Cartão Debito','Cartão Credito','Conta']
         self.modo_entry = ttk.Combobox(self.aba1,values=self.lista_modo, state='readonly',background='grey')  #Função que cria um entrada de texto
         self.modo_entry.place(relx= 0.22, rely= 0.4, relwidth=0.3, relheight=0.12)
         self.modo_entry.set('Dinheiro')
 
-        self.lab_entry = Entry(self.aba1,background='grey')  #Função que cria um entrada de texto
-        self.lab_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
-
+        #VENDEDOR
         self.lista_vendedor = ['Vileide','Vinicius','Marcio']
         self.combo_vendedor = ttk.Combobox(self.aba1,values=self.lista_vendedor, state='readonly',background='grey')
         self.combo_vendedor.place(relx=0.698, rely=0.6, relwidth=0.15, relheight=0.12)
         self.combo_vendedor.set('Vileide')
 
-        self.lb_quantidade = Label(self.aba2,text="Quantidade:", bg= 'grey38')
-        self.lb_quantidade.place(relx= 0.55, rely= 0.4, relwidth=0.16, relheight=0.15)
-
-        self.quantidade_entry = Entry(self.aba2,background='grey')
-        self.quantidade_entry.place(relx= 0.698, rely= 0.4, relwidth=0.295, relheight=0.12)
-
+        #TOTAL
         self.total_entry = Entry(self.aba1,background='grey')
-        self.total_entry.place(relx= 0.22, rely= 0.6, relwidth=0.3, relheight=0.12)
-        self.total_entry.insert(0,'a')
-
+        #self.total_entry.place(relx= 0.22, rely= 0.6, relwidth=0.3, relheight=0.12)
+        
+        #self.soma = float(self.quantidade_entry.get())*float(self.preco_entry.get())
+        #self.a = float(self.combo_vendedor.get())
+        #self.total_entry.insert(0,self.soma)
 
         """self.tipvar = StringVar(self.aba2)
         self.tipv = ("Vinicius", "Vileide")
@@ -299,7 +318,7 @@ class App(Funcs, Validators):
         self.lista.heading('#5', text='Preço')
         self.lista.heading('#6', text='Modo de Pagamento')
         self.lista.heading('#7', text='Vendedor')
-        #self.lista.heading('#8', text='Total')
+        self.lista.heading('#8', text='Total')
 
         self.lista.column('#0', width=0,minwidth=0) #função que define a grossura da coluna na lista
         self.lista.column('#1', width=50)
@@ -309,7 +328,7 @@ class App(Funcs, Validators):
         self.lista.column('#5', width=200)
         self.lista.column('#6', width=200)
         self.lista.column('#7', width=100)
-        #self.lista.column('#8', width=130)
+        self.lista.column('#8', width=130)
 
         self.lista.place(relx= 0.0001, rely= 0.001, relwidth=0.99, relheight=0.99) #função que define a posição da tabela
 
