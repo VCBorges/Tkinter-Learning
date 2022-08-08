@@ -1,3 +1,3 @@
 # Tkinter-Learning
 
-GUI in Tkinter for learning purposes
+Simple sales system in Tkinter using SQLite
